@@ -1747,7 +1747,11 @@ void simulationStep()
 				{
 					forceOfJ += dispersion;
 					BirdDisp[n] = BirdDisp[n] + gmtl::Vec4f(dispersion[0], dispersion[1], dispersion[2], 0.0f);
-					//printf("Dispersion magnitude: \t%f\n", gmtl::length(dispersion));
+					printf("Dispersion magnitude bird %i: \t%f\n",n, gmtl::length(dispersion));
+				}
+				else
+				{
+					printf("Dispersion magnitude bird %i: \t%f\tWas not added\n",n, gmtl::length(dispersion));
 				}
 				
 				accelMagAccum += gmtl::length(velocityMatching);
@@ -1755,7 +1759,11 @@ void simulationStep()
 				{
 					forceOfJ += velocityMatching;
 					BirdVelMatch[n] = BirdDisp[n] + gmtl::Vec4f(velocityMatching[0], velocityMatching[1], velocityMatching[2], 0.0f);
-					//printf("VelMatching magnitude: \t%f\n", gmtl::length(velocityMatching));
+					printf("VelMatching magnitude bird %i: \t%f\n",n ,gmtl::length(velocityMatching));
+				}
+				else
+				{
+					printf("VelMatching magnitude bird %i: \t%f\tWas not added!\n",n, gmtl::length(velocityMatching));
 				}
 				
 				accelMagAccum += gmtl::length(centering);
@@ -1763,14 +1771,14 @@ void simulationStep()
 				{
 					forceOfJ += centering;
 					BirdCenter[n] = BirdDisp[n] + gmtl::Vec4f(centering[0], centering[1], centering[2], 0.0f);
-					//printf("Centering magnitude: \t%f\n", gmtl::length(centering));
+					printf("Centering magnitude bird %i: \t%f\n",n, gmtl::length(centering));
 				}
 				else
 				{
-					//printf("Centering was not added to calculations!\n");
+					printf("Centering was not added to calculations!\n");
 				}
 
-				//printf("\n\n\n");
+				printf("\n\n\n");
 				//Force J on bird I = dispersion + centering + velocity matching + flight speed control
 				//forceOfJ = centering + dispersion + velocityMatching;
 				//BirdDisp[n] = BirdDisp[n] + gmtl::Vec4f( dispersion[0], dispersion[1], dispersion[2], 0.0f );
@@ -1849,9 +1857,9 @@ void simulationStep()
 
 		maxAccel = meanAccMag;
 		
-		// (meanDispMag + meanCentMag + meanVmatchMag) / (iterations);
+		//(meanDispMag + meanCentMag + meanVmatchMag) / (iterations);
 
-		printf("Max Accel is now: \t%f\n\n\n", maxAccel);
+		//printf("Max Accel is now: \t%f\n\n\n", maxAccel);
 
 		//printf("Mean Accelerations Magnitude is: %f\n", meanAccMag);
 		//
@@ -1885,7 +1893,7 @@ void simulationStep()
 		}
 		else if (gmtl::length(birdVelocity[n]) > 1.2)
 		{
-			//birdVelocity[n] -= plus_Y;
+			birdVelocity[n] -= plus_Y;
 			//printf("magntiude of vel is: %f\n\n", gmtl::length(birdVelocity[n]));
 			//gmtl::normalize(birdVelocity[n]);
 			//birdVelocity[n][1] -= 1.5;
@@ -1944,6 +1952,26 @@ void simulationStep()
 
 		newVertVel = gmtl::dot(birdVelocity[n], temp);
 
+		//printf("Current Velocity for bird %i is:\t%f\t%f\t%f\n\n\n", n, birdVelocity[n][0], birdVelocity[n][1], birdVelocity[n][2]);
+
+		/*printf("For bird %i, rotation is:\n");
+		for (int o = 0; o < 4; o++)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				printf("%f\t", birdArray[n].getRot(o, i));
+			}
+
+			printf("\n");
+
+		}
+		printf("\n\n");
+		
+
+		printf("For bird %i x is: \t%f\t%f\t%f\n\n\n", n, temp[0], temp[1], temp[2]);
+
+		printf("Current VertVel for bird %i is: %f\n\n\n", n, newVertVel);*/
+
 		//Update State
 		birdArray[n].setOmega(newOmega);
 		birdArray[n].setRot(newRot);
@@ -1964,7 +1992,7 @@ void simulationStep()
 	{
 		rotationAmount = birdArray[n].getOmega() * delta;
 
-		birdArray[n].setRadius(birdArray[n].getRadius() + (birdArray[n].getVertVel() * delta));
+		birdArray[n].setRadius(birdArray[n].getRadius() + ( birdArray[n].getVertVel() * delta ));
 
 		if (birdArray[n].getRadius() < 1.2)
 		{
@@ -1974,6 +2002,8 @@ void simulationStep()
 		{
 			birdVelocity[n] -= plus_X;
 		}
+
+		//printf("Current Radius for Bird %i is:\t%f\n\n\n", n, birdArray[n].getRadius());
 
 		change[0][0] = cos(toRadians(rotationAmount));
 		change[0][1] = sin(toRadians(rotationAmount)) * -1;
